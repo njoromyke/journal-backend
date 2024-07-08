@@ -1,13 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import config from "../config/config";
 import statusCodes from "../utils/status-codes.util";
+import { User } from "../types/user";
 
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const { prisma } = require("../config/db/database");
 
 interface CustomRequest extends Request {
-  user: any;
+  user: User;
 }
 
 const protect = asyncHandler(async (req: CustomRequest, res: Response, next: NextFunction) => {
