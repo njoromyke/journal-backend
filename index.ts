@@ -1,14 +1,11 @@
-import { Request, Response } from "express";
+import express, { Request, Response } from "express";
+require("dotenv").config();
 import config from "./config/config";
 
-const express = require("express");
 const app = express();
 const cors = require("cors");
-const dotenv = require("dotenv");
 const { connectDatabase } = require("./config/db/database");
 const { notFound, errorHandler } = require("./middlewares/error.middleware");
-
-dotenv.config();
 
 connectDatabase();
 
@@ -20,6 +17,8 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1/users", require("./routes/user.route"));
+app.use("/api/v1/category", require("./routes/category.route"));
+app.use("/api/v1/journals", require("./routes/journal.route"));
 
 const env = config.ENV;
 
