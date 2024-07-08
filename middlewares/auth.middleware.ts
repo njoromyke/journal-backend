@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import config from "../config/config";
+import statusCodes from "../utils/status-codes.util";
 
 const asyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
-const statusCodes = require("../utils/status-codes");
 const { prisma } = require("../config/db/database");
 
 interface CustomRequest extends Request {
@@ -17,6 +17,7 @@ const protect = asyncHandler(async (req: CustomRequest, res: Response, next: Nex
     try {
       token = req.headers.authorization.split(" ")[1];
       const decoded = jwt.verify(token, config.JWT_SECRET);
+
       const user = await prisma.user.findUnique({
         where: {
           id: decoded.id,
@@ -36,4 +37,4 @@ const protect = asyncHandler(async (req: CustomRequest, res: Response, next: Nex
   next();
 });
 
-module.exports = protect;
+export default protect;
