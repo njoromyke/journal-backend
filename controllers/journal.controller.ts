@@ -1,18 +1,27 @@
 import { Request, Response } from "express";
-import { Prisma } from "@prisma/client";
 import asyncHandler from "express-async-handler";
+import { User } from "../types/user";
 import { prisma } from "../config/db/database";
 import statusCodes from "../utils/status-codes.util";
 import { dateFilter } from "../utils/date.util";
+import { Prisma } from "@prisma/client";
 
-const createJournal = asyncHandler(async (req: Request, res: Response) => {
-  const { title, content, categoryId } = req.body;
+interface CustomRequest extends Request {
+  user?: User;
+}
 
-  const journalExists = await prisma.journal.findUnique({
-    where: { title },
+const createJournal = asyncHandler(async (req: CustomRequest, res: Response) => {
+  const { title, content, categoryId, date } = req.body;
+
+  const journalExists = await prisma.journal.findFirst({
+    where: {
+      title,
+      userId: req.user?.id,
+    },
   });
 
   if (journalExists) {
+    console.log(journalExists);
     res.status(statusCodes.BAD_REQUEST).json({
       message: "Journal already exists",
     });
@@ -24,42 +33,46 @@ const createJournal = asyncHandler(async (req: Request, res: Response) => {
     data: {
       title,
       content,
-      categoryId,
+      date,
+      category: {
+        connect: {
+          id: categoryId,
+        },
+      },
+      user: {
+        connect: {
+          id: req.user?.id,
+        },
+      },
     },
   });
 
-  res.status(statusCodes.CREATED).json({
-    message: "Journal created successfully",
-    journal: {
-      id: journal.id,
-      title: journal.title,
-      content: journal.content,
-      categoryId: journal.categoryId,
-    },
-  });
+  res.status(statusCodes.CREATED).json(journal);
 });
 
-const getJournals = asyncHandler(async (req: Request, res: Response) => {
-  const { categoryId, search, date } = req.query;
+const getMyJournals = asyncHandler(async (req: CustomRequest, res: Response) => {
+  const { date, filterText, categoryId } = req.query;
 
-  let where: Prisma.Journal_EntryWhereInput = {};
+  let where: Prisma.JournalWhereInput = {
+    userId: req.user?.id,
+  };
+
+  if (date) {
+    const dateData = dateFilter(date as string);
+    where.createdAt = {
+      gte: dateData.startDate,
+      lte: dateData.endDate,
+    };
+  }
+
+  if (filterText) {
+    where.title = {
+      contains: filterText as string,
+    };
+  }
 
   if (categoryId) {
-    where.categoryId = Number(categoryId);
-  }
-
-  if (search) {
-    where.title = {
-      contains: String(search),
-    };
-  }
-
-  if (dateFilter) {
-    const filter = dateFilter(date as string);
-    where.createdAt = {
-      gte: filter.startDate,
-      lte: filter.endDate,
-    };
+    where.categoryId = parseInt(categoryId as string);
   }
 
   const journals = await prisma.journal.findMany({
@@ -75,17 +88,18 @@ const getJournals = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-const getJournalById = asyncHandler(async (req: Request, res: Response) => {
+const updateJournal = asyncHandler(async (req: CustomRequest, res: Response) => {
   const { id } = req.params;
 
-  const journal = await prisma.journal.findUnique({
-    where: { id: Number(id) },
-    include: {
-      category: true,
+  const { title, content, categoryId, date } = req.body;
+
+  const existsJournal = await prisma.journal.findUnique({
+    where: {
+      id: Number(id),
     },
   });
 
-  if (!journal) {
+  if (!existsJournal) {
     res.status(statusCodes.NOT_FOUND).json({
       message: "Journal not found",
     });
@@ -93,48 +107,30 @@ const getJournalById = asyncHandler(async (req: Request, res: Response) => {
     return;
   }
 
-  res.status(statusCodes.OK).json({
-    message: "Journal fetched successfully",
-    journal,
-  });
-});
-
-const updateJournal = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { title, content, categoryId } = req.body;
-
-  const journal = await prisma.journal.findUnique({
-    where: { id: Number(id) },
-  });
-
-  if (!journal) {
-    res.status(statusCodes.NOT_FOUND).json({
-      message: "Journal not found",
-    });
-
-    return;
-  }
-
-  const updatedJournal = await prisma.journal.update({
+  const journal = await prisma.journal.update({
     where: { id: Number(id) },
     data: {
-      title: title || journal.title,
-      content: content || journal.content,
-      categoryId: categoryId || journal.categoryId,
+      title: title || existsJournal.title,
+      content: content || existsJournal.content,
+      date: date || existsJournal.date,
+      category: {
+        connect: {
+          id: categoryId,
+        },
+      },
     },
   });
 
-  res.status(statusCodes.OK).json({
-    message: "Journal updated successfully",
-    journal: updatedJournal,
-  });
+  res.status(statusCodes.OK).json(journal);
 });
 
-const deleteJournal = asyncHandler(async (req: Request, res: Response) => {
+const getJournalById = asyncHandler(async (req: CustomRequest, res: Response) => {
   const { id } = req.params;
 
-  const journal = await prisma.journal.findUnique({
-    where: { id: Number(id) },
+  const journal = await prisma.journal.findFirst({
+    where: {
+      id: parseInt(id),
+    },
   });
 
   if (!journal) {
@@ -145,13 +141,7 @@ const deleteJournal = asyncHandler(async (req: Request, res: Response) => {
     return;
   }
 
-  await prisma.journal.delete({
-    where: { id: Number(id) },
-  });
-
-  res.status(statusCodes.OK).json({
-    message: "Journal deleted successfully",
-  });
+  res.status(statusCodes.OK).json(journal);
 });
 
-export { createJournal, getJournals, getJournalById, updateJournal, deleteJournal };
+export { createJournal, getJournalById, getMyJournals, updateJournal };
