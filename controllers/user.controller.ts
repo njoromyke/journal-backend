@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/db/database";
-import { generateToken } from "../utils/jwt";
-
-const asyncHandler = require("express-async-handler");
-const { comparePassword } = require("../utils/user");
+import { generateToken } from "../utils/jwt.util";
+import statusCodes from "../utils/status-codes.util";
+import asyncHandler from "express-async-handler";
+import { comparePassword } from "../utils/user.util";
 
 const createUser = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
@@ -16,6 +16,8 @@ const createUser = asyncHandler(async (req: Request, res: Response) => {
     res.status(statusCodes.BAD_REQUEST).json({
       message: "User already exists",
     });
+
+    return;
   }
 
   const user = await prisma.user.create({
@@ -48,6 +50,8 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     res.status(statusCodes.NOT_FOUND).json({
       message: "User not found",
     });
+
+    return;
   }
 
   const isMatch = await comparePassword(email, password);
@@ -56,6 +60,8 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     res.status(statusCodes.UNAUTHORIZED).json({
       message: "Invalid email or password",
     });
+
+    return;
   }
 
   res.status(statusCodes.OK).json({
@@ -80,6 +86,8 @@ const updateProfile = asyncHandler(async (req: Request, res: Response) => {
     res.status(statusCodes.NOT_FOUND).json({
       message: "User not found",
     });
+
+    return;
   }
 
   const updatedUser = await prisma.user.update({
@@ -113,6 +121,8 @@ const getUserById = asyncHandler(async (req: Request, res: Response) => {
     res.status(statusCodes.NOT_FOUND).json({
       message: "User not found",
     });
+
+    return;
   }
 
   res.status(statusCodes.OK).json({
@@ -125,4 +135,4 @@ const getUserById = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-module.exports = { createUser, loginUser, updateProfile, getUserById };
+export { createUser, loginUser, updateProfile, getUserById };
