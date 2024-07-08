@@ -6,6 +6,7 @@ const app = express();
 const cors = require("cors");
 const dotenv = require("dotenv");
 const { connectDatabase } = require("./config/db/database");
+const { notFound, errorHandler } = require("./middlewares/error.middleware");
 
 dotenv.config();
 
@@ -19,6 +20,9 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 const env = config.ENV;
+
+app.use(notFound);
+app.use(errorHandler);
 
 app.listen(config.PORT, () => {
   if (env === "development") {
