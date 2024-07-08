@@ -6,7 +6,7 @@ import statusCodes from "../utils/status-codes.util";
 import { dateFilter } from "../utils/date.util";
 import { Prisma } from "@prisma/client";
 
-interface CustomRequest extends Request {
+export interface CustomRequest extends Request {
   user?: User;
 }
 

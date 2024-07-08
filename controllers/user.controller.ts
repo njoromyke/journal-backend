@@ -4,6 +4,11 @@ import { generateToken } from "../utils/jwt.util";
 import statusCodes from "../utils/status-codes.util";
 import asyncHandler from "express-async-handler";
 import { comparePassword } from "../utils/user.util";
+import { User } from "../types/user";
+
+export interface CustomRequest extends Request {
+  user?: User;
+}
 
 const createUser = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
@@ -135,4 +140,29 @@ const getUserById = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-export { createUser, loginUser, updateProfile, getUserById };
+const getLoggedInUser = asyncHandler(async (req: CustomRequest, res: Response) => {
+  const id = req.user?.id;
+
+  const user = await prisma.user.findUnique({
+    where: { id },
+  });
+
+  if (!user) {
+    res.status(statusCodes.NOT_FOUND).json({
+      message: "User not found",
+    });
+
+    return;
+  }
+
+  res.status(statusCodes.OK).json({
+    message: "User found successfully",
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    },
+  });
+});
+
+export { createUser, loginUser, updateProfile, getUserById, getLoggedInUser };
