@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npx ts-node index.ts",
-    "dev": "nodemon index.ts && tsc",
+    "dev": "tsc && nodemon index.ts",
     "build": "tsc",
     "db:migrate": "npx prisma migrate dev --name user-entity --create-only && npx prisma generate",
     "db:push": "npx prisma db push"
@@ -20,6 +20,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-async-handler": "^1.2.0",
+    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
