@@ -1,10 +1,12 @@
+import { createUser, getUserById, loginUser, updateProfile } from "../controllers/user.controller";
+import { createUserValidator, loginUserValidator, updateProfileValidator } from "../controllers/validations/user.validation";
+
 const express = require("express");
 const router = express.Router();
-const { loginUser, createUser, updateProfile, getUserById } = require("../controllers/user.controller");
 
-router.route("/").post(createUser);
-router.route("/login").post(loginUser);
+router.route("/").post(createUserValidator, createUser);
+router.route("/login").post(loginUserValidator, loginUser);
 
-router.route("/user/:id").post(loginUser).get(getUserById).put(updateProfile);
+router.route("/user/:id").get(getUserById).put(updateProfileValidator, updateProfile);
 
 module.exports = router;
