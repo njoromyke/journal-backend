@@ -20,27 +20,27 @@ CREATE TABLE [dbo].[Category] (
     [name] NVARCHAR(1000) NOT NULL,
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [Category_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIME2 NOT NULL,
-    CONSTRAINT [Category_pkey] PRIMARY KEY CLUSTERED ([id])
+    CONSTRAINT [Category_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [Category_name_key] UNIQUE NONCLUSTERED ([name])
 );
 
 -- CreateTable
-CREATE TABLE [dbo].[Journal_Entry] (
+CREATE TABLE [dbo].[Journal] (
     [id] INT NOT NULL IDENTITY(1,1),
     [title] NVARCHAR(1000) NOT NULL,
     [content] NVARCHAR(1000) NOT NULL,
-    [date] DATETIME2 NOT NULL,
-    [createdAt] DATETIME2 NOT NULL CONSTRAINT [Journal_Entry_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [createdAt] DATETIME2 NOT NULL CONSTRAINT [Journal_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIME2 NOT NULL,
-    [categoryId] INT,
-    [userId] INT,
-    CONSTRAINT [Journal_Entry_pkey] PRIMARY KEY CLUSTERED ([id])
+    [userId] INT NOT NULL,
+    [categoryId] INT NOT NULL,
+    CONSTRAINT [Journal_pkey] PRIMARY KEY CLUSTERED ([id])
 );
 
 -- AddForeignKey
-ALTER TABLE [dbo].[Journal_Entry] ADD CONSTRAINT [Journal_Entry_categoryId_fkey] FOREIGN KEY ([categoryId]) REFERENCES [dbo].[Category]([id]) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE [dbo].[Journal] ADD CONSTRAINT [Journal_userId_fkey] FOREIGN KEY ([userId]) REFERENCES [dbo].[User]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE [dbo].[Journal_Entry] ADD CONSTRAINT [Journal_Entry_userId_fkey] FOREIGN KEY ([userId]) REFERENCES [dbo].[User]([id]) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE [dbo].[Journal] ADD CONSTRAINT [Journal_categoryId_fkey] FOREIGN KEY ([categoryId]) REFERENCES [dbo].[Category]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 COMMIT TRAN;
 

@@ -14,36 +14,32 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
   name      String?
   password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  entries   Journal_Entry[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  entries   Journal[]
 }
-
 
 model Category {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  entries   Journal_Entry[]
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  entries   Journal[]
 }
 
-model Journal_Entry {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  date      DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  category  Category? @relation(fields: [categoryId], references: [id])
-  categoryId Int?
-  userId    Int?
-  user      User? @relation(fields: [userId], references: [id])
+model Journal {
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  date       DateTime
+  userId     Int
+  categoryId Int
+  user       User     @relation(fields: [userId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
 }
-
-
-
