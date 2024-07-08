@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
-import statusCodes from "../../utils/status-codes.util";
+import statusCodes from "../utils/status-codes.util";
 
 const createJournalValidator = (req: Request, res: Response, next: NextFunction) => {
   const schema = Joi.object({

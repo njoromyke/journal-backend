@@ -1,7 +1,7 @@
 import express from "express";
 import { createJournal, getJournals, getJournalById, deleteJournal, updateJournal } from "../controllers/journal.controller";
 import protect from "../middlewares/auth.middleware";
-import { createJournalValidator, updateJournalValidator } from "../controllers/validations/journal.validation";
+import { createJournalValidator, updateJournalValidator } from "../validations/journal.validation";
 
 const router = express.Router();
 

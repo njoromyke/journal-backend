@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { NextFunction, Request, Response } from "express";
-import statusCodes from "../../utils/status-codes.util";
+import statusCodes from "../utils/status-codes.util";
 
 const createCategoryValidator = (req: Request, res: Response, next: NextFunction) => {
   const schema = Joi.object({
@@ -31,3 +31,5 @@ const updateCategoryValidator = (req: Request, res: Response, next: NextFunction
 
   next();
 };
+
+export { createCategoryValidator, updateCategoryValidator };
