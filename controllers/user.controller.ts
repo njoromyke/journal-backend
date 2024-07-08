@@ -101,4 +101,27 @@ const updateProfile = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-module.exports = { createUser, loginUser, updateProfile };
+const getUserById = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const user = await prisma.user.findUnique({
+    where: { id },
+  });
+
+  if (!user) {
+    res.status(statusCodes.NOT_FOUND).json({
+      message: "User not found",
+    });
+  }
+
+  res.status(statusCodes.OK).json({
+    message: "User found successfully",
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    },
+  });
+});
+
+module.exports = { createUser, loginUser, updateProfile, getUserById };
