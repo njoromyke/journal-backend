@@ -15,4 +15,4 @@ async function comparePassword(email: string, password: string): Promise<boolean
   return true;
 }
 
-module.exports = { comparePassword };
+export { comparePassword };
