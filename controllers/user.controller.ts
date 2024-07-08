@@ -3,6 +3,7 @@ import { prisma } from "../config/db/database";
 import { generateToken } from "../utils/jwt";
 
 const asyncHandler = require("express-async-handler");
+const { comparePassword } = require("../utils/user");
 
 const createUser = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
