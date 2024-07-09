@@ -6,19 +6,24 @@ const app = express();
 const cors = require("cors");
 const { connectDatabase } = require("./config/db/database");
 const { notFound, errorHandler } = require("./middlewares/error.middleware");
+const morgan = require("morgan");
 
 connectDatabase();
 
 app.use(cors());
 app.use(express.json());
 
+if (config.ENV === "development") {
+  app.use(morgan("dev"));
+}
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World");
 });
 
-app.use("/api/v1/users", require("./routes/user.route"));
-app.use("/api/v1/category", require("./routes/category.route"));
-app.use("/api/v1/journals", require("./routes/journal.route"));
+app.use("/api/users", require("./routes/user.route"));
+app.use("/api/category", require("./routes/category.route"));
+app.use("/api/journals", require("./routes/journal.route"));
 
 const env = config.ENV;
 
