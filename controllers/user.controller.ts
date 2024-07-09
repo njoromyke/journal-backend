@@ -161,6 +161,7 @@ const getLoggedInUser = asyncHandler(async (req: CustomRequest, res: Response) =
       id: user.id,
       name: user.name,
       email: user.email,
+      token: generateToken(user.id),
     },
   });
 });

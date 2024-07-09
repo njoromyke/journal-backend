@@ -9,7 +9,7 @@ router.route("/").post(createUserValidator, createUser);
 
 router.route("/login").post(loginUserValidator, loginUser);
 
-router.route("/user").get(protect, getLoggedInUser);
+router.route("/user/me").get(protect, getLoggedInUser);
 
 router.route("/user/:id").get(getUserById).put(updateProfileValidator, updateProfile);
 
